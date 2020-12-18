@@ -17,11 +17,14 @@
           <font-awesome-icon icon="music" />
         </div>
         <div class="music-info">
-          <span class="music-name">{{ music.name }}</span>
+          <span class="music-name">{{ music.name }} </span>
           <span class="music-artist">{{ music.artist }} </span>
         </div>
         <button class="music-status">
-          <font-awesome-icon icon="pause" v-if="checkActiveMusic(index)" />
+          <font-awesome-icon
+            icon="pause"
+            v-if="checkActiveMusic(index) && getPlayingStatus"
+          />
           <font-awesome-icon icon="play" v-else />
         </button>
       </li>
@@ -39,17 +42,31 @@ export default {
     getActiveMusicIndex() {
       return this.$store.state.activeMusic.index;
     },
+    getPlayingStatus() {
+      return this.$store.state.isPlay;
+    },
   },
   methods: {
     selectMusic(music, index) {
-      let chosenMusic = {
-        index: index,
-        music: music,
-      };
-      this.$store.commit("setCurrentMusic", chosenMusic);
+      if (index == this.getActiveMusicIndex) {
+        this.updatePlayingStatus(!this.getPlayingStatus);
+      } else {
+        let chosenMusic = {
+          index: index,
+          music: music,
+        };
+        this.setActiveMusic(chosenMusic);
+        this.updatePlayingStatus(true);
+      }
     },
     checkActiveMusic(index) {
       return index == this.getActiveMusicIndex;
+    },
+    setActiveMusic(music) {
+      this.$store.commit("setCurrentMusic", music);
+    },
+    updatePlayingStatus(status) {
+      this.$store.commit("updatePlayStatus", status);
     },
   },
 };

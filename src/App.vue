@@ -1,26 +1,50 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <main class="container">
+    <Musics />
+    <ActiveMusic />
+  </main>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import Musics from "./components/Musics";
+import ActiveMusic from "./components/ActiveMusic";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faPause,
+  faPauseCircle,
+  faPlay,
+  faMusic,
+  faHeart,
+  faRedoAlt,
+  faStepBackward,
+  faPlayCircle,
+  faStepForward,
+  faRandom,
+  faVolumeUp,
+} from "@fortawesome/free-solid-svg-icons";
 
+library.add(
+  faPlay,
+  faPause,
+  faPauseCircle,
+  faMusic,
+  faHeart,
+  faRedoAlt,
+  faStepBackward,
+  faPlayCircle,
+  faStepForward,
+  faRandom,
+  faVolumeUp
+);
 export default {
   name: "App",
   components: {
-    HelloWorld
-  }
+    Musics,
+    ActiveMusic,
+  },
 };
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import "assets/scss/main";
 </style>

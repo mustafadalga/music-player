@@ -58,8 +58,7 @@ main {
 .musics {
     background-color: var(--musics-color);
     color: var(--black);
-    width: 100%;
-    flex-basis: 45%;
+    width: 40%;
     padding: 1.5rem;
 }
 
@@ -116,10 +115,10 @@ main {
     margin-left: 2.5rem;
     display: flex;
     flex-direction: column;
+    max-width: 75%;
 }
 
 .music-name {
-    max-width: 15rem;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -136,11 +135,15 @@ main {
 
 .active-color {
     @include activeMusicColor();
+    color: var(--white);
+    svg {
+        color: var(--white);
+    }
 }
 
 .active-music {
     @include activeMusicColor();
-    flex-basis: 55%;
+    width: 60%;
     padding: 2.5rem;
     display: flex;
     flex-direction: column;
@@ -164,10 +167,13 @@ main {
     -moz-box-shadow: 0px 1px 5px 0px rgba(0, 0, 52, 0.5);
     box-shadow: 0px 1px 5px 0px rgba(0, 0, 52, 0.5);
     justify-content: center;
-    animation: rotate 1s linear infinite;
     #dummy {
         margin-top: 100%;
     }
+}
+
+.logo-animation {
+    animation: rotate 1s linear infinite;
 }
 
 @keyframes rotate {
@@ -216,34 +222,6 @@ main {
     margin: 2.5rem auto;
 }
 
-.progressbar {
-    width: 100%;
-    height: 1rem;
-    border-radius: .8rem;
-    background-color: var(--white);
-    position: relative;
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 30%;
-        height: 100%;
-        border-radius: inherit;
-    }
-    &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: calc(30% - 1.5rem);
-        width: 1.5rem;
-        height: 1.5rem;
-        transform: translateY(-50%);
-        border-radius: inherit;
-        cursor: pointer;
-    }
-}
-
 .music-times {
     display: flex;
     justify-content: space-between;
@@ -272,10 +250,44 @@ main {
     font-size: 2.4rem;
 }
 
+.btn-underline {
+    border-bottom: 1px solid var(--white);
+}
+
 .volume {
     display: flex;
     align-items: center;
     grid-column-gap: 1.5rem;
-    max-width: 30rem;
+    max-width: 50rem;
     margin-top: 2.5rem;
+}
+
+input[type=range] {
+    border-radius: 8px;
+    height: 1.5rem;
+    outline: none;
+    //transition: background 450ms ease-in;
+    box-shadow: var(--bs-md);
+    -webkit-appearance: none;
+}
+
+.volume-range {
+    background: var(--white);
+    width: 100%;
+}
+
+.music-range {
+    width: 100%;
+    background: transparent;
+    background: linear-gradient(to right, rgba(255, 255, 255, .2) 0%, rgba(255, 255, 255, 0.2) 100%);
+    pointer-events: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    height: 2rem;
+    width: 2rem;
+    border-radius: 100%;
+    background: var(--white);
+    cursor: pointer;
+    -webkit-appearance: none;
 }

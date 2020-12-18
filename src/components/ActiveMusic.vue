@@ -1,11 +1,8 @@
 <template>
   <section class="active-music">
-    <div class="logo">
+    <div class="logo" :class="isPlay ? 'logo-animation' : ''">
       <font-awesome-icon icon="music" />
       <div id="dummy"></div>
-    </div>
-    <div class="active-music-logo" style="display: none">
-      <div class="logo-border"></div>
     </div>
     <span class="active-music-name"
       >{{ getActiveMusic.music.name }}
@@ -16,33 +13,48 @@
       <div class="temp"></div
     ></span>
     <div class="active-music-status">
-      <div class="progressbar music-progressbar"></div>
+      <input type="range" value="0" class="music-range" ref="music_range" />
       <div class="music-times">
-        <span class="active-time">00:29</span>
-        <span class="all-music-time">04:25</span>
+        <span class="active-time" ref="currentTime">{{
+          getCurrentTime(currentTime)
+        }}</span>
+        <span class="all-music-time" ref="duration">{{
+          getCurrentTime(durationTime)
+        }}</span>
       </div>
     </div>
     <div class="active-music-options">
-      <button class="btn-loop">
+      <button
+        class="btn-loop"
+        :class="isLoop ? 'btn-underline' : ''"
+        @click="loopMusicToggleBtn"
+      >
         <font-awesome-icon icon="redo-alt" />
       </button>
-      <button class="btn-prev">
+      <button class="btn-prev" @click="prevMusic">
         <font-awesome-icon icon="step-backward" />
       </button>
-      <button class="btn-play" @click="play">
-        <font-awesome-icon icon="play-circle" />
-        <font-awesome-icon :icon="['fas', 'pause-circle']" />
+      <button class="btn-play" @click="playToggleBtn">
+        <font-awesome-icon
+          :icon="['fas', 'pause-circle']"
+          v-if="getPlayingStatus"
+        />
+        <font-awesome-icon icon="play-circle" v-else />
       </button>
-      <button class="btn-next">
+      <button class="btn-next" @click="nextMusic">
         <font-awesome-icon icon="step-forward" />
       </button>
-      <button class="btn-random">
+      <button
+        class="btn-random"
+        @click="randomMusicToggleBtn"
+        :class="isRandom ? 'btn-underline' : ''"
+      >
         <font-awesome-icon icon="random" />
       </button>
     </div>
     <div class="volume">
       <font-awesome-icon icon="volume-up" />
-      <div class="progressbar music-progressbar"></div>
+      <input type="range" value="100" class="volume-range" ref="volume_range" />
     </div>
   </section>
 </template>
@@ -51,27 +63,212 @@
 export default {
   name: "ActiveMusic",
   data() {
+    /*
+    Music Status Kod : Meanings
+    -1:do nothing!
+    0:The music hasn't started playing yet
+    1:New Music - Music has been changed.
+    2:Paused music started to continue.(Changed from within Musics.vue.)
+    3:Music is paused.(Changed from within Musics.vue.)
+    4:Paused music started to continue.(Changed from within ActiveMusic.vue.)
+    5:Music is paused.(Changed from within ActiveMusic.vue.)
+    6: Next and Prev Music
+    */
     return {
-      music: null,
+      player: new Audio(),
+      activeMusic: null,
+      isPlay: false,
+      isLoop: false,
+      isRandom: false,
+      musicStatusKod: 0,
+      currentTime: 0,
+      durationTime: 0,
     };
   },
   computed: {
     getActiveMusic() {
       return this.$store.state.activeMusic;
     },
+    getPlayingStatus() {
+      return this.$store.state.isPlay;
+    },
   },
-  created() {},
-  mounted() {},
+
+  watch: {
+    getPlayingStatus(newStatus) {
+      this.musicStatusKod = newStatus ? 2 : 3;
+    },
+    getActiveMusic() {
+      this.activeMusic = this.getActiveMusic;
+      this.changeMusic();
+      this.musicStatusKod = 1;
+    },
+    musicStatusKod() {
+      console.log(this.musicStatusKod);
+      this.checkPlayStatus();
+    },
+  },
+  mounted() {
+    this.$refs.volume_range.addEventListener(
+      "input",
+      this.handleVolumeProgress
+    );
+    this.$refs.music_range.addEventListener("input", this.updateMusicProgress);
+    this.player.addEventListener("timeupdate", this.handleMusicProgress);
+    this.player.addEventListener("canplay", () => {
+      this.durationTime = this.player.duration;
+    });
+  },
   methods: {
-    getNote() {},
-    setMusic() {
-      this.music = new Audio(this.getActiveMusic.music.file);
-      this.music.pause();
-      this.music.currentTime = 0;
+    updateMusicProgress(event) {
+      let value = event.target.value;
+      this.updateProgressBColor(event.target, value);
+      this.updateCurrentTime(value);
+    },
+    handleVolumeProgress(event) {
+      let value = event.target.value;
+      this.updateProgressBColor(event.target, value);
+      this.player.volume = value / 100;
+    },
+    getMusics() {
+      return this.$store.state.musics;
+    },
+    getNewMusic() {},
+    nextMusic() {
+      if (this.musicStatusKod == 0) return;
+      let musics = this.getMusics();
+      let currentIndex = this.getActiveMusic.index;
+      let nextIndex = currentIndex == musics.length - 1 ? 0 : currentIndex + 1;
+      let newMusic = musics[nextIndex];
+      let chosenMusic = {
+        index: nextIndex,
+        music: newMusic,
+      };
+      this.setActiveMusic(chosenMusic);
+    },
+    prevMusic() {
+      if (this.musicStatusKod == 0) return;
+      let musics = this.getMusics();
+      let currentIndex = this.getActiveMusic.index;
+
+      let prevIndex = currentIndex == 0 ? musics.length - 1 : currentIndex - 1;
+      let newMusic = musics[prevIndex];
+      let chosenMusic = {
+        index: prevIndex,
+        music: newMusic,
+      };
+      this.setActiveMusic(chosenMusic);
+    },
+    getCurrentTime(time) {
+      let hour = Math.floor(time / 3600);
+      let minute = Math.floor(time / 60);
+      let second = Math.floor(time - (hour * 3600 + minute * 60));
+      hour = hour > 9 ? hour : `0${hour}`;
+      second = second > 9 ? second : `0${second}`;
+      minute = minute > 9 ? minute : `0${minute}`;
+      let formatTime =
+        hour > 0 ? `${hour}:${minute}:${second}` : `${minute}:${second}`;
+      return formatTime;
+    },
+    setActiveMusic(music) {
+      this.$store.commit("setCurrentMusic", music);
+    },
+    changeMusic() {
+      this.player.src = this.getActiveMusic.music.file;
+      this.$refs.music_range.style.pointerEvents = "auto";
+    },
+    playToggleBtn() {
+      if (!this.activeMusic) return;
+      if (this.isPlay) {
+        this.musicStatusKod = 5;
+      } else {
+        this.musicStatusKod = 4;
+      }
+    },
+    loopMusicToggleBtn() {
+      this.isLoop = !this.isLoop;
+    },
+    randomMusicToggleBtn() {
+      this.isRandom = !this.isRandom;
+    },
+    checkPlayStatus() {
+      switch (this.musicStatusKod) {
+        case 1:
+        case 2:
+        case 4:
+          this.play();
+          this.updatePlayStatus(true);
+          this.musicStatusKod = -1;
+          break;
+        case 3:
+        case 5:
+          this.pause();
+          this.updatePlayStatus(false);
+          this.musicStatusKod = -1;
+          break;
+        default:
+          break;
+      }
     },
     play() {
-      this.setMusic();
-      this.music.play();
+      let promise = this.player.play();
+      if (promise !== undefined) {
+        promise.catch(() => {
+          this.player.play();
+        });
+      }
+    },
+    getRandomMusic() {
+      let musics = this.getMusics();
+      let index = Math.floor(Math.random() * musics.length);
+      let newMusic = musics[index];
+      let chosenMusic = {
+        index: index,
+        music: newMusic,
+      };
+      return chosenMusic;
+    },
+    isMusicOver() {
+      return Math.floor(this.currentTime) == Math.floor(this.durationTime);
+    },
+    restartMusic() {
+      this.player.currentTime = 0;
+    },
+    handleMusicProgress() {
+      if (this.isMusicOver()) {
+        this.pause();
+        this.restartMusic();
+        if (this.isLoop) {
+          this.restartMusic();
+          this.play();
+        } else if (this.isRandom) {
+          let randomMusic = this.getRandomMusic();
+          this.setActiveMusic(randomMusic);
+        } else {
+          this.nextMusic();
+        }
+      }
+
+      let percent = (this.player.currentTime / this.durationTime) * 100;
+      let musicRange = this.$refs.music_range;
+      musicRange.value = percent;
+      this.updateProgressBColor(musicRange, percent);
+      this.currentTime = this.player.currentTime;
+    },
+    updateCurrentTime(value) {
+      const scrubTime = (value * this.durationTime) / 100;
+      this.player.currentTime = scrubTime;
+    },
+    updateProgressBColor(input, percent) {
+      input.style.background = `
+        linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 255, 255) ${percent}%, rgba(255, 255, 255, 0.2) ${percent}%, rgba(255, 255, 255, 0.2) 100%)`;
+    },
+    updatePlayStatus(status) {
+      this.isPlay = status;
+      this.$store.commit("updatePlayStatus", status);
+    },
+    pause() {
+      this.player.pause();
     },
   },
 };

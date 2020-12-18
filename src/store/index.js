@@ -15,12 +15,15 @@ export default createStore({
             { name: 'Purpose', file: require('@/assets/musics/Purpose.mp3'), artist: 'AShamaluev' }
         ],
         activeMusic: { music: '', index: -1 },
-        isplay: false,
+        isPlay: false,
     },
     mutations: {
         setCurrentMusic: (state, newMusic) => {
             state.activeMusic = newMusic
         },
+        updatePlayStatus(state, status) {
+            state.isPlay = status
+        }
 
     },
     actions: {},
