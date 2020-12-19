@@ -12,7 +12,10 @@ export default createStore({
             { name: 'Inspiring Acoustic', file: require('@/assets/musics/Inspiring-Acoustic.mp3'), artist: 'AShamaluev' },
             { name: 'Modern Egypt', file: require('@/assets/musics/Modern-Egypt.mp3'), artist: 'AShamaluev' },
             { name: 'Mountain', file: require('@/assets/musics/Mountain.mp3'), artist: 'AShamaluev' },
-            { name: 'Purpose', file: require('@/assets/musics/Purpose.mp3'), artist: 'AShamaluev' }
+            { name: 'Purpose', file: require('@/assets/musics/Purpose.mp3'), artist: 'AShamaluev' },
+            { name: 'Success', file: require('@/assets/musics/Success.mp3'), artist: 'AShamaluev' },
+            { name: 'Vip', file: require('@/assets/musics/Vip.mp3'), artist: 'AShamaluev' },
+            { name: 'Air', file: require('@/assets/musics/Air.mp3'), artist: 'AShamaluev' },
         ],
         activeMusic: { music: '', index: -1 },
         isPlay: false,
