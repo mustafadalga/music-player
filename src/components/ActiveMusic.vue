@@ -72,7 +72,6 @@ export default {
     3:Music is paused.(Changed from within Musics.vue.)
     4:Paused music started to continue.(Changed from within ActiveMusic.vue.)
     5:Music is paused.(Changed from within ActiveMusic.vue.)
-    6: Next and Prev Music
     */
     return {
       player: new Audio(),
@@ -133,31 +132,19 @@ export default {
     getMusics() {
       return this.$store.state.musics;
     },
-    getNewMusic() {},
+    getCurrentMusicIndex() {
+      return this.getActiveMusic.index;
+    },
     nextMusic() {
-      if (this.musicStatusKod == 0) return;
-      let musics = this.getMusics();
-      let currentIndex = this.getActiveMusic.index;
-      let nextIndex = currentIndex == musics.length - 1 ? 0 : currentIndex + 1;
-      let newMusic = musics[nextIndex];
-      let chosenMusic = {
-        index: nextIndex,
-        music: newMusic,
-      };
-      this.setActiveMusic(chosenMusic);
+      let newMusic = this.isRandom
+        ? this.getNewMusic("random")
+        : this.getNewMusic("next");
+      this.setActiveMusic(newMusic);
     },
     prevMusic() {
       if (this.musicStatusKod == 0) return;
-      let musics = this.getMusics();
-      let currentIndex = this.getActiveMusic.index;
-
-      let prevIndex = currentIndex == 0 ? musics.length - 1 : currentIndex - 1;
-      let newMusic = musics[prevIndex];
-      let chosenMusic = {
-        index: prevIndex,
-        music: newMusic,
-      };
-      this.setActiveMusic(chosenMusic);
+      let newMusic = this.getNewMusic("prev");
+      this.setActiveMusic(newMusic);
     },
     getCurrentTime(time) {
       let hour = Math.floor(time / 3600);
@@ -177,8 +164,9 @@ export default {
       this.player.src = this.getActiveMusic.music.file;
       this.$refs.music_range.style.pointerEvents = "auto";
     },
+    selectFirstMusic() {},
     playToggleBtn() {
-      if (!this.activeMusic) return;
+      if (this.musicStatusKod == 0) this.nextMusic();
       if (this.isPlay) {
         this.musicStatusKod = 5;
       } else {
@@ -218,12 +206,25 @@ export default {
         });
       }
     },
-    getRandomMusic() {
+    getNewMusic(status = "next") {
+      status = String(status).toLowerCase();
       let musics = this.getMusics();
-      let index = Math.floor(Math.random() * musics.length);
-      let newMusic = musics[index];
+      let currentIndex = this.getCurrentMusicIndex();
+      var newIndex = null;
+      switch (status) {
+        case "next":
+          newIndex = currentIndex == musics.length - 1 ? 0 : currentIndex + 1;
+          break;
+        case "prev":
+          newIndex = currentIndex == 0 ? musics.length - 1 : currentIndex - 1;
+          break;
+        case "random":
+          newIndex = Math.floor(Math.random() * musics.length);
+          break;
+      }
+      let newMusic = musics[newIndex];
       let chosenMusic = {
-        index: index,
+        index: newIndex,
         music: newMusic,
       };
       return chosenMusic;
@@ -239,16 +240,11 @@ export default {
         this.pause();
         this.restartMusic();
         if (this.isLoop) {
-          this.restartMusic();
           this.play();
-        } else if (this.isRandom) {
-          let randomMusic = this.getRandomMusic();
-          this.setActiveMusic(randomMusic);
         } else {
           this.nextMusic();
         }
       }
-
       let percent = (this.player.currentTime / this.durationTime) * 100;
       let musicRange = this.$refs.music_range;
       musicRange.value = percent;
