@@ -266,7 +266,6 @@ input[type=range] {
     border-radius: 8px;
     height: 1.5rem;
     outline: none;
-    //transition: background 450ms ease-in;
     box-shadow: var(--bs-md);
     -webkit-appearance: none;
 }
@@ -290,4 +289,13 @@ input[type=range]::-webkit-slider-thumb {
     background: var(--white);
     cursor: pointer;
     -webkit-appearance: none;
+}
+
+@media screen and (max-width:750px) {
+    .musics {
+        display: none;
+    }
+    .active-music {
+        width: 100%;
+    }
 }
