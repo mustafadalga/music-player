@@ -9,15 +9,16 @@
 :root {
     --black: #161B22;
     --white: #fff;
-    --musics-color: #f6f5fa;
+    --musics-color: 136, 79, 255, 1;
+    --electric-violet: rgba(136, 79, 255, 1);
     --bs-xs: 0 1px 6px rgba(0, 0, 52, .25);
     --bs-sm: 0 1px 6px rgba(0, 0, 52, .50);
     --bs-md: 0 1px 6px rgba(0, 0, 52, .75);
 }
 
 @mixin activeMusicColor {
-    background: rgb(136, 79, 255);
-    background: linear-gradient(90deg, rgba(136, 79, 255, 1) 0%, rgba(208, 46, 254, 1) 97%, rgba(214, 44, 254, 1) 100%);
+    background: var(--electric-violet);
+    background: linear-gradient(90deg, var(--electric-violet) 0%, rgba(208, 46, 254, 1) 97%, rgba(214, 44, 254, 1) 100%);
 }
 
 html {
@@ -80,6 +81,11 @@ main {
     }
 }
 
+button.btn-active-playlist {
+    background-color: var(--electric-violet);
+    color: var(--white);
+}
+
 .music-list {
     margin-top: 2.5rem;
     display: flex;
@@ -105,6 +111,9 @@ main {
     padding: 1rem 1.5rem 1rem 1rem;
     box-shadow: var(--bs-xs);
     cursor: pointer;
+    &:hover {
+        box-shadow: var(--bs-sm);
+    }
 }
 
 .music-logo {
@@ -201,9 +210,12 @@ main {
     margin-top: 2.5rem;
 }
 
-.active-music-name {
-    i {
-        font-size: 1.8rem;
+.btn-like {
+    font-size: 2rem;
+    &.liked {
+        svg {
+            color: #d50000;
+        }
     }
 }
 
@@ -289,6 +301,14 @@ input[type=range]::-webkit-slider-thumb {
     background: var(--white);
     cursor: pointer;
     -webkit-appearance: none;
+}
+
+.bookmarks-warning {
+    margin-top: 15rem;
+    padding: 2.5rem;
+    box-shadow: var(--bs-xs);
+    font-size: 3rem;
+    text-align: center;
 }
 
 @media screen and (max-width:750px) {

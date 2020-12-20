@@ -5,11 +5,16 @@
       <div id="dummy"></div>
     </div>
     <span class="active-music-name"
-      >{{ getActiveMusic.music.name }}
-      <button><font-awesome-icon icon="heart" /></button
+      >{{ getActiveMusic.name }}
+      <button
+        class="btn-like"
+        :class="checkBookMarkMusic ? 'liked' : ''"
+        @click="toggleLikeBtn"
+      >
+        <font-awesome-icon icon="heart" /></button
     ></span>
     <span class="active-music-artist"
-      >{{ getActiveMusic.music.artist }}
+      >{{ getActiveMusic.artist }}
       <div class="temp"></div
     ></span>
     <div class="active-music-status">
@@ -77,6 +82,7 @@ export default {
     */
     return {
       player: new Audio(),
+      musics: [],
       activeMusic: null,
       isPlay: false,
       isLoop: false,
@@ -86,20 +92,38 @@ export default {
       durationTime: 0,
     };
   },
+  computed: {
+    getActivePlayList() {
+      return this.$store.state.activePlayList;
+    },
+    checkBookMarkMusic() {
+      return this.getBookMarksIndex.includes(this.getActiveMusic.index);
+    },
+  },
   watch: {
     getPlayingStatus(newStatus) {
       this.musicStatusKod = newStatus ? 2 : 3;
     },
-    getActiveMusic() {
-      this.activeMusic = this.getActiveMusic;
+    getActiveMusic(value) {
+      this.activeMusic = value;
       this.changeMusic();
       this.musicStatusKod = 1;
     },
     musicStatusKod() {
       this.checkPlayStatus();
     },
+    getActivePlayList() {
+      this.updatePlayList();
+    },
+    getBookMarksIndex: {
+      handler() {
+        this.updatePlayList();
+      },
+      deep: true,
+    },
   },
   mounted() {
+    this.updatePlayList();
     this.$refs.volume_range.addEventListener(
       "input",
       this.handleVolumeProgress
@@ -111,6 +135,28 @@ export default {
     });
   },
   methods: {
+    updatePlayList() {
+      let playList = this.getActivePlayList;
+      if (playList == "all") {
+        this.musics = this.getMusics;
+      } else if (playList == "bookmarks") {
+        this.musics =
+          this.getBookMarks().length > 0 ? this.getBookMarks() : this.getMusics;
+      }
+    },
+    checkExistsBookMarksIndex(index) {
+      let bookmarks = this.$store.state.bookMarksMusicsIndex;
+      return bookmarks.includes(index);
+    },
+    toggleLikeBtn() {
+      let index = this.getActiveMusic.index;
+      if (index == -1) return;
+      if (!this.checkExistsBookMarksIndex(index)) {
+        this.$store.commit("addBookMarkMusic", index);
+      } else {
+        this.$store.commit("removeBookMarkMusic", index);
+      }
+    },
     updateMusicProgress(event) {
       let value = event.target.value;
       this.updateProgressBColor(event.target, value);
@@ -144,7 +190,7 @@ export default {
       return formatTime;
     },
     changeMusic() {
-      this.player.src = this.getActiveMusic.music.file;
+      this.player.src = this.getActiveMusic.file;
       this.$refs.music_range.style.pointerEvents = "auto";
     },
     playToggleBtn() {
@@ -190,26 +236,27 @@ export default {
     },
     getNewMusic(status = "next") {
       status = String(status).toLowerCase();
-      let musics = this.getMusics;
-      let currentIndex = this.getActiveMusicIndex();
-      var newIndex = null;
+      let newIndex = this.getNewMusicIndex(status);
+      return this.musics[newIndex];
+    },
+    getNewMusicIndex(status) {
+      let currentIndex = this.musics.findIndex(
+        (music) => music.index == this.getActiveMusic.index
+      );
+      let musicsCount = this.musics.length;
+      var newIndex;
       switch (status) {
         case "next":
-          newIndex = currentIndex == musics.length - 1 ? 0 : currentIndex + 1;
+          newIndex = currentIndex == musicsCount - 1 ? 0 : currentIndex + 1;
           break;
         case "prev":
-          newIndex = currentIndex == 0 ? musics.length - 1 : currentIndex - 1;
+          newIndex = currentIndex == 0 ? musicsCount - 1 : currentIndex - 1;
           break;
         case "random":
-          newIndex = Math.floor(Math.random() * musics.length);
+          newIndex = Math.floor(Math.random() * musicsCount);
           break;
       }
-      let newMusic = musics[newIndex];
-      let chosenMusic = {
-        index: newIndex,
-        music: newMusic,
-      };
-      return chosenMusic;
+      return newIndex;
     },
     isMusicOver() {
       return Math.floor(this.currentTime) == Math.floor(this.durationTime);

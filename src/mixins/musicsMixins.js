@@ -5,32 +5,30 @@ export default {
         },
     },
     methods: {
-        selectMusic(music, index) {
-            if (index == this.getActiveMusicIndex()) {
+        selectMusic(music) {
+            if (music.index == this.getActiveMusicIndex()) {
                 this.updatePlayStatus(!this.getPlayingStatus);
             } else {
-                let chosenMusic = {
-                    index: index,
-                    music: music,
-                };
-                this.setActiveMusic(chosenMusic);
+                this.setActiveMusic(music);
                 this.updatePlayStatus(true);
             }
         },
         updateMusicListScroll(event) {
+            var parent = this.$refs.musicList;
+            if (parent == undefined) return;
             var childY;
             let scroolTopChangeLimit = 250;
-            var parent = this.$refs.musicList;
             let parentY = parent.offsetTop;
+            var scrollTop = 0
             if (event) {
                 childY = event.target.offsetTop;
             } else {
                 childY = this.$refs.activeMusic.offsetTop;
             }
             if (childY > scroolTopChangeLimit) {
-                let scroll = childY - parentY - 100;
-                parent.scrollTop = scroll;
+                scrollTop = childY - parentY - 100;
             }
+            parent.scrollTop = scrollTop;
         },
         checkActiveMusic(index) {
             return index == this.getActiveMusicIndex();

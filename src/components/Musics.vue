@@ -2,33 +2,33 @@
   <section class="musics">
     <div class="musics-options">
       <button
-        @click="setPlayList('all')"
+        @click="updatePlayList('all')"
         :class="checkActivePlaylist('all') ? 'btn-active-playlist' : ''"
       >
         All Musics
       </button>
       <button
-        @click="setPlayList('bookmarks')"
+        @click="updatePlayList('bookmarks')"
         :class="checkActivePlaylist('bookmarks') ? 'btn-active-playlist' : ''"
       >
         BookMarks
       </button>
     </div>
 
-    <transition name="component-fade">
-      <AllMusicsPlayList v-if="activePlayList == 'all'" />
-      <BookMarksPlayList v-else-if="activePlayList == 'bookmarks'" />
-    </transition>
+    <template v-if="activePlayList == 'all'">
+      <AllMusicsPlayList />
+    </template>
+    <template v-else-if="activePlayList == 'bookmarks'">
+      <BookMarksPlayList />
+    </template>
   </section>
 </template>
 
 <script>
-import globalMixins from "@/mixins/globalMixins";
 import AllMusicsPlayList from "./AllMusicsPlayList.vue";
 import BookMarksPlayList from "./BookMarksPlayList.vue";
 export default {
   name: "Musics",
-  mixins: [globalMixins],
   components: {
     AllMusicsPlayList,
     BookMarksPlayList,
@@ -36,13 +36,13 @@ export default {
   data() {
     return {
       activePlayList: "all",
-      docState: false,
     };
   },
   mounted() {},
   methods: {
-    setPlayList(status) {
-      this.activePlayList = status;
+    updatePlayList(playList) {
+      this.activePlayList = playList;
+      this.$store.commit("updatePlayList", playList);
     },
     checkActivePlaylist(playlist) {
       return playlist == this.activePlayList;
@@ -50,14 +50,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.component-fade-enter-active,
-.component-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.component-fade-enter,
-.component-fade-leave-to {
-  opacity: 0;
-}
-</style>

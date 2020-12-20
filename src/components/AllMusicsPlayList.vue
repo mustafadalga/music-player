@@ -4,12 +4,12 @@
       class="music-item"
       v-for="(music, index) in getMusics"
       :key="index"
-      :class="checkActiveMusic(index) ? 'active-color' : ''"
+      :class="checkActiveMusic(music.index) ? 'active-color' : ''"
       @click="
-        selectMusic(music, index);
+        selectMusic(music);
         updateMusicListScroll($event);
       "
-      :ref="checkActiveMusic(index) ? 'activeMusic' : ''"
+      :ref="checkActiveMusic(music.index) ? 'activeMusic' : ''"
     >
       <div class="music-logo">
         <font-awesome-icon icon="music" />
@@ -21,7 +21,7 @@
       <button class="music-status">
         <font-awesome-icon
           icon="pause"
-          v-if="checkActiveMusic(index) && getPlayingStatus"
+          v-if="checkActiveMusic(music.index) && getPlayingStatus"
         />
         <font-awesome-icon icon="play" v-else />
       </button>
