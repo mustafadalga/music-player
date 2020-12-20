@@ -10,6 +10,7 @@
         class="btn-like"
         :class="checkBookMarkMusic ? 'liked' : ''"
         @click="toggleLikeBtn"
+        v-if="getActiveMusic.index !== -1"
       >
         <font-awesome-icon icon="heart" /></button
     ></span>
@@ -128,13 +129,29 @@ export default {
       "input",
       this.handleVolumeProgress
     );
+
     this.$refs.music_range.addEventListener("input", this.updateMusicProgress);
     this.player.addEventListener("timeupdate", this.handleMusicProgress);
     this.player.addEventListener("canplay", () => {
       this.durationTime = this.player.duration;
     });
+
+    this.setVolumeFromLocalStorage();
   },
   methods: {
+    setVolumeFromLocalStorage() {
+      let volume = parseFloat(this.getLocalStorageData("volume"));
+      let input = this.$refs.volume_range;
+      this.player.volume = volume / 100;
+      input.value = volume;
+      this.updateProgressBColor(input, volume);
+    },
+    getLocalStorageData(dataName) {
+      return localStorage.getItem(dataName);
+    },
+    setLocalStorageData(dataName, data) {
+      localStorage.setItem(dataName, data);
+    },
     updatePlayList() {
       let playList = this.getActivePlayList;
       if (playList == "all") {
@@ -166,6 +183,7 @@ export default {
       let value = event.target.value;
       this.updateProgressBColor(event.target, value);
       this.player.volume = value / 100;
+      this.setLocalStorageData("volume", value);
     },
     nextMusic() {
       let newMusic = this.isRandom

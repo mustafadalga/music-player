@@ -17,7 +17,7 @@ export default createStore({
             { index: 112, name: 'Vip', file: require('@/assets/musics/Vip.mp3'), artist: 'AShamaluev' },
             { index: 122, name: 'Air', file: require('@/assets/musics/Air.mp3'), artist: 'AShamaluev' },
         ],
-        bookMarksMusicsIndex: [],
+        bookMarksMusicsIndex: JSON.parse(localStorage.getItem('bookMarks')) || [],
         activeMusic: { index: -1, music: '' },
         isPlay: false,
         activePlayList: "all",
@@ -31,12 +31,17 @@ export default createStore({
         },
         addBookMarkMusic(state, index) {
             state.bookMarksMusicsIndex.push(index)
+            this.commit('updateBookMarksFromLocalStorage')
         },
         removeBookMarkMusic(state, index) {
             state.bookMarksMusicsIndex = state.bookMarksMusicsIndex.filter(item => item !== index)
+            this.commit('updateBookMarksFromLocalStorage')
         },
         updatePlayList(state, playList) {
             state.activePlayList = playList
+        },
+        updateBookMarksFromLocalStorage(state) {
+            localStorage.setItem('bookMarks', JSON.stringify(state.bookMarksMusicsIndex));
         }
     },
     actions: {},
