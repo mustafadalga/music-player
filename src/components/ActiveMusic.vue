@@ -60,8 +60,10 @@
 </template>
 
 <script>
+import globalMixins from "@/mixins/globalMixins";
 export default {
   name: "ActiveMusic",
+  mixins: [globalMixins],
   data() {
     /*
     Music Status Kod : Meanings
@@ -84,15 +86,6 @@ export default {
       durationTime: 0,
     };
   },
-  computed: {
-    getActiveMusic() {
-      return this.$store.state.activeMusic;
-    },
-    getPlayingStatus() {
-      return this.$store.state.isPlay;
-    },
-  },
-
   watch: {
     getPlayingStatus(newStatus) {
       this.musicStatusKod = newStatus ? 2 : 3;
@@ -103,7 +96,6 @@ export default {
       this.musicStatusKod = 1;
     },
     musicStatusKod() {
-      console.log(this.musicStatusKod);
       this.checkPlayStatus();
     },
   },
@@ -129,12 +121,6 @@ export default {
       this.updateProgressBColor(event.target, value);
       this.player.volume = value / 100;
     },
-    getMusics() {
-      return this.$store.state.musics;
-    },
-    getCurrentMusicIndex() {
-      return this.getActiveMusic.index;
-    },
     nextMusic() {
       let newMusic = this.isRandom
         ? this.getNewMusic("random")
@@ -157,14 +143,10 @@ export default {
         hour > 0 ? `${hour}:${minute}:${second}` : `${minute}:${second}`;
       return formatTime;
     },
-    setActiveMusic(music) {
-      this.$store.commit("setCurrentMusic", music);
-    },
     changeMusic() {
       this.player.src = this.getActiveMusic.music.file;
       this.$refs.music_range.style.pointerEvents = "auto";
     },
-    selectFirstMusic() {},
     playToggleBtn() {
       if (this.musicStatusKod == 0) this.nextMusic();
       if (this.isPlay) {
@@ -208,8 +190,8 @@ export default {
     },
     getNewMusic(status = "next") {
       status = String(status).toLowerCase();
-      let musics = this.getMusics();
-      let currentIndex = this.getCurrentMusicIndex();
+      let musics = this.getMusics;
+      let currentIndex = this.getActiveMusicIndex();
       var newIndex = null;
       switch (status) {
         case "next":
@@ -258,10 +240,6 @@ export default {
     updateProgressBColor(input, percent) {
       input.style.background = `
         linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 255, 255) ${percent}%, rgba(255, 255, 255, 0.2) ${percent}%, rgba(255, 255, 255, 0.2) 100%)`;
-    },
-    updatePlayStatus(status) {
-      this.isPlay = status;
-      this.$store.commit("updatePlayStatus", status);
     },
     pause() {
       this.player.pause();
