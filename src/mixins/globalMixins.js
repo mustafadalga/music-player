@@ -1,9 +1,4 @@
 export default {
-    data() {
-        return {
-            activePlayList: "all",
-        }
-    },
     computed: {
         getMusics() {
             return this.$store.state.musics;

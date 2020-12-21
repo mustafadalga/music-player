@@ -1,16 +1,10 @@
 <template>
   <section class="musics">
     <div class="musics-options">
-      <button
-        @click="updatePlayList('all')"
-        :class="checkActivePlaylist('all') ? 'btn-active-playlist' : ''"
-      >
+      <button @click="updatePlayList('all')" :class="checkActivePlaylist('all') ? 'btn-active-playlist' : ''">
         All Musics
       </button>
-      <button
-        @click="updatePlayList('bookmarks')"
-        :class="checkActivePlaylist('bookmarks') ? 'btn-active-playlist' : ''"
-      >
+      <button @click="updatePlayList('bookmarks')" :class="checkActivePlaylist('bookmarks') ? 'btn-active-playlist' : ''">
         BookMarks
       </button>
     </div>

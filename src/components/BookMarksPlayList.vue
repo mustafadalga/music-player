@@ -1,17 +1,10 @@
 <template>
   <template v-if="bookMarks.length > 0">
     <ul class="music-list" ref="musicList">
-      <li
-        class="music-item"
-        v-for="(bookMark, index) in bookMarks"
-        :key="index"
+      <li class="music-item" v-for="(bookMark, index) in bookMarks" :key="index"
         :class="checkActiveMusic(bookMark.index) ? 'active-color' : ''"
-        @click="
-          selectMusic(bookMark);
-          updateMusicListScroll($event);
-        "
-        :ref="checkActiveMusic(bookMark.index) ? 'activeMusic' : ''"
-      >
+        @click="selectMusic(bookMark);updateMusicListScroll($event);"
+        :ref="checkActiveMusic(bookMark.index) ? 'activeMusic' : ''">
         <div class="music-logo">
           <font-awesome-icon icon="music" />
         </div>
@@ -20,10 +13,7 @@
           <span class="music-artist">{{ bookMark.artist }}</span>
         </div>
         <button class="music-status">
-          <font-awesome-icon
-            icon="pause"
-            v-if="checkActiveMusic(bookMark.index) && getPlayingStatus"
-          />
+          <font-awesome-icon icon="pause" v-if="checkActiveMusic(bookMark.index) && getPlayingStatus"/>
           <font-awesome-icon icon="play" v-else />
         </button>
       </li>

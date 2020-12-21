@@ -13,6 +13,9 @@ export default {
                 this.updatePlayStatus(true);
             }
         },
+        checkActiveMusic(index) {
+            return index == this.getActiveMusicIndex();
+        },
         updateMusicListScroll(event) {
             var parent = this.$refs.musicList;
             if (parent == undefined) return;
@@ -29,9 +32,6 @@ export default {
                 scrollTop = childY - parentY - 100;
             }
             parent.scrollTop = scrollTop;
-        },
-        checkActiveMusic(index) {
-            return index == this.getActiveMusicIndex();
         },
     }
 }

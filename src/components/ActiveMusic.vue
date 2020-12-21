@@ -4,57 +4,36 @@
       <font-awesome-icon icon="music" />
       <div id="dummy"></div>
     </div>
-    <span class="active-music-name"
-      >{{ getActiveMusic.name }}
-      <button
-        class="btn-like"
-        :class="checkBookMarkMusic ? 'liked' : ''"
-        @click="toggleLikeBtn"
-        v-if="getActiveMusic.index !== -1"
-      >
-        <font-awesome-icon icon="heart" /></button
-    ></span>
-    <span class="active-music-artist"
-      >{{ getActiveMusic.artist }}
-      <div class="temp"></div
-    ></span>
+    <span class="active-music-name" >
+      {{ getActiveMusic.name }}
+
+      <button class="btn-like" :class="checkBookMarkMusic ? 'liked' : ''"  @click="toggleLikeBtn" v-if="getActiveMusic.index !== -1">
+        <font-awesome-icon icon="heart" />
+      </button>
+    </span>
+    <span class="active-music-artist">{{ getActiveMusic.artist }}</span>
     <div class="active-music-status">
       <input type="range" value="0" class="music-range" ref="music_range" />
       <div class="music-times">
-        <span class="active-time" ref="currentTime">{{
-          getCurrentTime(currentTime)
-        }}</span>
-        <span class="all-music-time" ref="duration">{{
-          getCurrentTime(durationTime)
-        }}</span>
+        <span class="active-time" ref="currentTime">{{getCurrentTime(currentTime) }}</span>
+        <span class="all-music-time" ref="duration">{{ getCurrentTime(durationTime) }}</span>
       </div>
     </div>
     <div class="active-music-options">
-      <button
-        class="btn-loop"
-        :class="isLoop ? 'btn-underline' : ''"
-        @click="loopMusicToggleBtn"
-      >
+      <button class="btn-loop" :class="isLoop ? 'btn-underline' : ''" @click="loopMusicToggleBtn">
         <font-awesome-icon icon="redo-alt" />
       </button>
       <button class="btn-prev" @click="prevMusic">
         <font-awesome-icon icon="step-backward" />
       </button>
       <button class="btn-play" @click="playToggleBtn">
-        <font-awesome-icon
-          :icon="['fas', 'pause-circle']"
-          v-if="getPlayingStatus"
-        />
+        <font-awesome-icon :icon="['fas', 'pause-circle']" v-if="getPlayingStatus"/>
         <font-awesome-icon icon="play-circle" v-else />
       </button>
       <button class="btn-next" @click="nextMusic">
         <font-awesome-icon icon="step-forward" />
       </button>
-      <button
-        class="btn-random"
-        @click="randomMusicToggleBtn"
-        :class="isRandom ? 'btn-underline' : ''"
-      >
+      <button class="btn-random" @click="randomMusicToggleBtn" :class="isRandom ? 'btn-underline' : ''">
         <font-awesome-icon icon="random" />
       </button>
     </div>
@@ -85,10 +64,10 @@ export default {
       player: new Audio(),
       musics: [],
       activeMusic: null,
+      musicStatusKod: 0,
       isPlay: false,
       isLoop: false,
       isRandom: false,
-      musicStatusKod: 0,
       currentTime: 0,
       durationTime: 0,
     };
@@ -102,6 +81,9 @@ export default {
     },
   },
   watch: {
+    getActivePlayList() {
+      this.updatePlayList();
+    },
     getPlayingStatus(newStatus) {
       this.musicStatusKod = newStatus ? 2 : 3;
     },
@@ -113,9 +95,6 @@ export default {
     musicStatusKod() {
       this.checkPlayStatus();
     },
-    getActivePlayList() {
-      this.updatePlayList();
-    },
     getBookMarksIndex: {
       handler() {
         this.updatePlayList();
@@ -124,46 +103,29 @@ export default {
     },
   },
   mounted() {
-    this.updatePlayList();
-    this.$refs.volume_range.addEventListener(
-      "input",
-      this.handleVolumeProgress
-    );
-
-    this.$refs.music_range.addEventListener("input", this.updateMusicProgress);
-    this.player.addEventListener("timeupdate", this.handleMusicProgress);
-    this.player.addEventListener("canplay", () => {
-      this.durationTime = this.player.duration;
-    });
-
     this.setVolumeFromLocalStorage();
+    this.updatePlayList();
+    this.addEventListener();
   },
   methods: {
-    setVolumeFromLocalStorage() {
-      let volume = parseFloat(this.getLocalStorageData("volume"));
-      let input = this.$refs.volume_range;
-      this.player.volume = volume / 100;
-      input.value = volume;
-      this.updateProgressBColor(input, volume);
-    },
-    getLocalStorageData(dataName) {
-      return localStorage.getItem(dataName);
-    },
-    setLocalStorageData(dataName, data) {
-      localStorage.setItem(dataName, data);
-    },
-    updatePlayList() {
-      let playList = this.getActivePlayList;
-      if (playList == "all") {
-        this.musics = this.getMusics;
-      } else if (playList == "bookmarks") {
-        this.musics =
-          this.getBookMarks().length > 0 ? this.getBookMarks() : this.getMusics;
+    playToggleBtn() {
+      if (this.musicStatusKod == 0) this.nextMusic();
+      if (this.isPlay) {
+        this.musicStatusKod = 5;
+      } else {
+        this.musicStatusKod = 4;
       }
     },
-    checkExistsBookMarksIndex(index) {
-      let bookmarks = this.$store.state.bookMarksMusicsIndex;
-      return bookmarks.includes(index);
+    nextMusic() {
+      let newMusic = this.isRandom
+        ? this.getNewMusic("random")
+        : this.getNewMusic("next");
+      this.checkSameMusic(newMusic);
+    },
+    prevMusic() {
+      if (this.musicStatusKod == 0) return;
+      let newMusic = this.getNewMusic("prev");
+      this.checkSameMusic(newMusic);
     },
     toggleLikeBtn() {
       let index = this.getActiveMusic.index;
@@ -174,56 +136,27 @@ export default {
         this.$store.commit("removeBookMarkMusic", index);
       }
     },
-    updateMusicProgress(event) {
-      let value = event.target.value;
-      this.updateProgressBColor(event.target, value);
-      this.updateCurrentTime(value);
-    },
-    handleVolumeProgress(event) {
-      let value = event.target.value;
-      this.updateProgressBColor(event.target, value);
-      this.player.volume = value / 100;
-      this.setLocalStorageData("volume", value);
-    },
-    nextMusic() {
-      let newMusic = this.isRandom
-        ? this.getNewMusic("random")
-        : this.getNewMusic("next");
-      this.setActiveMusic(newMusic);
-    },
-    prevMusic() {
-      if (this.musicStatusKod == 0) return;
-      let newMusic = this.getNewMusic("prev");
-      this.setActiveMusic(newMusic);
-    },
-    getCurrentTime(time) {
-      let hour = Math.floor(time / 3600);
-      let minute = Math.floor(time / 60);
-      let second = Math.floor(time - (hour * 3600 + minute * 60));
-      hour = hour > 9 ? hour : `0${hour}`;
-      second = second > 9 ? second : `0${second}`;
-      minute = minute > 9 ? minute : `0${minute}`;
-      let formatTime =
-        hour > 0 ? `${hour}:${minute}:${second}` : `${minute}:${second}`;
-      return formatTime;
-    },
-    changeMusic() {
-      this.player.src = this.getActiveMusic.file;
-      this.$refs.music_range.style.pointerEvents = "auto";
-    },
-    playToggleBtn() {
-      if (this.musicStatusKod == 0) this.nextMusic();
-      if (this.isPlay) {
-        this.musicStatusKod = 5;
-      } else {
-        this.musicStatusKod = 4;
-      }
-    },
     loopMusicToggleBtn() {
       this.isLoop = !this.isLoop;
     },
     randomMusicToggleBtn() {
       this.isRandom = !this.isRandom;
+    },
+    updatePlayList() {
+      let playList = this.getActivePlayList;
+      if (playList == "all") {
+        this.musics = this.getMusics;
+      } else if (playList == "bookmarks") {
+        this.musics =
+          this.getBookMarks().length > 0 ? this.getBookMarks() : this.getMusics;
+      }
+    },
+    checkSameMusic(newMusic) {
+      if (newMusic.index !== this.getActiveMusic.index) {
+        this.setActiveMusic(newMusic);
+      } else {
+        this.play();
+      }
     },
     checkPlayStatus() {
       switch (this.musicStatusKod) {
@@ -252,6 +185,16 @@ export default {
         });
       }
     },
+    pause() {
+      this.player.pause();
+    },
+    restartMusic() {
+      this.player.currentTime = 0;
+    },
+    changeMusic() {
+      this.player.src = this.getActiveMusic.file;
+      this.$refs.music_range.style.pointerEvents = "auto";
+    },
     getNewMusic(status = "next") {
       status = String(status).toLowerCase();
       let newIndex = this.getNewMusicIndex(status);
@@ -276,11 +219,19 @@ export default {
       }
       return newIndex;
     },
-    isMusicOver() {
-      return Math.floor(this.currentTime) == Math.floor(this.durationTime);
-    },
-    restartMusic() {
-      this.player.currentTime = 0;
+    addEventListener() {
+      this.$refs.volume_range.addEventListener(
+        "input",
+        this.handleVolumeProgress
+      );
+      this.$refs.music_range.addEventListener(
+        "input",
+        this.updateMusicProgress
+      );
+      this.player.addEventListener("timeupdate", this.handleMusicProgress);
+      this.player.addEventListener("canplay", () => {
+        this.durationTime = this.player.duration;
+      });
     },
     handleMusicProgress() {
       if (this.isMusicOver()) {
@@ -298,16 +249,54 @@ export default {
       this.updateProgressBColor(musicRange, percent);
       this.currentTime = this.player.currentTime;
     },
-    updateCurrentTime(value) {
-      const scrubTime = (value * this.durationTime) / 100;
-      this.player.currentTime = scrubTime;
-    },
     updateProgressBColor(input, percent) {
       input.style.background = `
         linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 255, 255) ${percent}%, rgba(255, 255, 255, 0.2) ${percent}%, rgba(255, 255, 255, 0.2) 100%)`;
     },
-    pause() {
-      this.player.pause();
+    updateMusicProgress(event) {
+      let value = event.target.value;
+      this.updateProgressBColor(event.target, value);
+      this.updateCurrentTime(value);
+    },
+    handleVolumeProgress(event) {
+      let value = event.target.value;
+      this.updateProgressBColor(event.target, value);
+      this.player.volume = value / 100;
+      this.setLocalStorageData("volume", value);
+    },
+    updateCurrentTime(value) {
+      const scrubTime = (value * this.durationTime) / 100;
+      this.player.currentTime = scrubTime;
+    },
+    setVolumeFromLocalStorage() {
+      let volume = parseFloat(this.getLocalStorageData("volume")) || 100;
+      let input = this.$refs.volume_range;
+      this.player.volume = volume / 100;
+      input.value = volume;
+      this.updateProgressBColor(input, volume);
+    },
+    getLocalStorageData(dataName) {
+      return localStorage.getItem(dataName);
+    },
+    setLocalStorageData(dataName, data) {
+      localStorage.setItem(dataName, data);
+    },
+    checkExistsBookMarksIndex(index) {
+      let bookmarks = this.$store.state.bookMarksMusicsIndex;
+      return bookmarks.includes(index);
+    },
+    isMusicOver() {
+      return Math.floor(this.currentTime) == Math.floor(this.durationTime);
+    },
+    getCurrentTime(time) {
+      let hour = Math.floor(time / 3600);
+      let minute = Math.floor(time / 60);
+      let second = Math.floor(time - (hour * 3600 + minute * 60));
+      hour = hour > 9 ? hour : `0${hour}`;
+      second = second > 9 ? second : `0${second}`;
+      minute = minute > 9 ? minute : `0${minute}`;
+      let formatTime = hour > 0 ? `${hour}:${minute}:${second}` : `${minute}:${second}`;
+      return formatTime;
     },
   },
 };

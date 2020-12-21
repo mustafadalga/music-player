@@ -204,10 +204,11 @@ button.btn-active-playlist {
 }
 
 .active-music-name {
-    justify-content: space-around;
+    justify-content: center;
     font-size: 2.5rem;
     max-width: 40rem;
     margin-top: 2.5rem;
+    grid-column-gap: 2.5rem;
 }
 
 .btn-like {
@@ -222,10 +223,7 @@ button.btn-active-playlist {
 .active-music-artist {
     max-width: 40rem;
     font-size: 1.6rem;
-    justify-content: space-around;
-    .temp {
-        width: 2.5rem;
-    }
+    justify-content: center;
 }
 
 .active-music-status {

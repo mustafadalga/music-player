@@ -1,16 +1,9 @@
 <template>
   <ul class="music-list" ref="musicList">
-    <li
-      class="music-item"
-      v-for="(music, index) in getMusics"
-      :key="index"
+    <li class="music-item" v-for="(music, index) in getMusics" :key="index"
       :class="checkActiveMusic(music.index) ? 'active-color' : ''"
-      @click="
-        selectMusic(music);
-        updateMusicListScroll($event);
-      "
-      :ref="checkActiveMusic(music.index) ? 'activeMusic' : ''"
-    >
+      @click="selectMusic(music);updateMusicListScroll($event);"
+      :ref="checkActiveMusic(music.index) ? 'activeMusic' : ''">
       <div class="music-logo">
         <font-awesome-icon icon="music" />
       </div>
@@ -19,10 +12,7 @@
         <span class="music-artist">{{ music.artist }}</span>
       </div>
       <button class="music-status">
-        <font-awesome-icon
-          icon="pause"
-          v-if="checkActiveMusic(music.index) && getPlayingStatus"
-        />
+        <font-awesome-icon icon="pause" v-if="checkActiveMusic(music.index) && getPlayingStatus"/>
         <font-awesome-icon icon="play" v-else />
       </button>
     </li>
@@ -37,6 +27,3 @@ export default {
   mixins: [globalMixins, musicsMixins],
 };
 </script>
-
-<style>
-</style>
