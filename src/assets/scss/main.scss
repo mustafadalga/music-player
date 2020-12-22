@@ -9,6 +9,8 @@
 :root {
     --black: #161B22;
     --white: #fff;
+    --red: #ff0000;
+    --red-accent-4: #d50000;
     --musics-color: 136, 79, 255, 1;
     --electric-violet: rgba(136, 79, 255, 1);
     --bs-xs: 0 1px 6px rgba(0, 0, 52, .25);
@@ -19,6 +21,11 @@
 @mixin activeMusicColor {
     background: var(--electric-violet);
     background: linear-gradient(90deg, var(--electric-violet) 0%, rgba(208, 46, 254, 1) 97%, rgba(214, 44, 254, 1) 100%);
+}
+@mixin btnLikeTransition(){
+    transition: all .3s ease-in;
+    -moz-transition: all .3s ease-in;
+    -webkit-transition: all .3s ease-in;
 }
 
 html {
@@ -78,6 +85,9 @@ main {
         padding: 1rem;
         font-size: 1.6rem;
         width: calc(50% - 1.5rem);
+        &:hover{
+            box-shadow: var(--bs-md);
+        }
     }
 }
 
@@ -211,14 +221,56 @@ button.btn-active-playlist {
     grid-column-gap: 2.5rem;
 }
 
+
 .btn-like {
-    font-size: 2rem;
+    width: 3.2rem;
+    height: 3.2rem;
+    transition: all .2s;
+    position: relative;
+    svg{
+        color: var(--white);
+        font-size: 2rem;
+        position: absolute;
+        top:50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        @include btnLikeTransition();
+
+    }
     &.liked {
         svg {
-            color: #d50000;
+            color: var(--red-accent-4);
         }
     }
+    &:before {
+        content: " ";
+        position: absolute;
+        top: -1rem;
+        left:-1rem;
+        width:calc(100% + 2rem);
+        height: calc(100% + 2rem);
+        border-radius: 100%;
+        @include btnLikeTransition();
+        transform: scale3d(0, 0, 0);
+        -webkit-transform: scale3d(0, 0, 0);
+        background-color: rgba(255,255,255, 0.25);
+        box-shadow: var(--bs-xs);
+        opacity: 1;
+    }
+    &:hover{
+        &.liked {
+            svg {
+                color: var(--red);
+            }
+        }
+    }
+    &:hover:before {
+        transform: scale3d(1, 1, 1);
+        opacity: 1;
+    }
 }
+
+
 
 .active-music-artist {
     max-width: 40rem;
@@ -246,6 +298,13 @@ button.btn-active-playlist {
     grid-column-gap: 2.5rem;
 }
 
+.btn{
+    transition: transform .2s;
+    &:hover
+    {
+        transform: scale(1.4);
+    }
+}
 .btn-play {
     font-size: 6.4rem;
 }
@@ -261,7 +320,7 @@ button.btn-active-playlist {
 }
 
 .btn-underline {
-    border-bottom: 1px solid var(--white);
+    border-bottom: 4px solid var(--red-accent-4);
 }
 
 .volume {

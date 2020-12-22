@@ -20,20 +20,20 @@
       </div>
     </div>
     <div class="active-music-options">
-      <button class="btn-loop" :class="isLoop ? 'btn-underline' : ''" @click="loopMusicToggleBtn">
+      <button class="btn btn-loop" :class="isLoop ? 'btn-underline' : ''" @click="loopMusicToggleBtn">
         <font-awesome-icon icon="redo-alt" />
       </button>
-      <button class="btn-prev" @click="prevMusic">
+      <button class="btn btn-prev" @click="prevMusic">
         <font-awesome-icon icon="step-backward" />
       </button>
-      <button class="btn-play" @click="playToggleBtn">
+      <button class="btn btn-play" @click="playToggleBtn">
         <font-awesome-icon :icon="['fas', 'pause-circle']" v-if="getPlayingStatus"/>
         <font-awesome-icon icon="play-circle" v-else />
       </button>
-      <button class="btn-next" @click="nextMusic">
+      <button class="btn btn-next" @click="nextMusic">
         <font-awesome-icon icon="step-forward" />
       </button>
-      <button class="btn-random" @click="randomMusicToggleBtn" :class="isRandom ? 'btn-underline' : ''">
+      <button class="btn btn-random" @click="randomMusicToggleBtn" :class="isRandom ? 'btn-underline' : ''">
         <font-awesome-icon icon="random" />
       </button>
     </div>
@@ -251,7 +251,8 @@ export default {
     },
     updateProgressBColor(input, percent) {
       input.style.background = `
-        linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 255, 255) ${percent}%, rgba(255, 255, 255, 0.2) ${percent}%, rgba(255, 255, 255, 0.2) 100%)`;
+        linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 255, 255) ${percent}%,
+         rgba(255, 255, 255, 0.2) ${percent}%, rgba(255, 255, 255, 0.2) 100%)`;
     },
     updateMusicProgress(event) {
       let value = event.target.value;
