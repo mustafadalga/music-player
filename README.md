@@ -1,4 +1,4 @@
-<h1 align="center">
+<h6 align="center">
   <img alt="Music Player" src="https://user-images.githubusercontent.com/25087769/102891638-98c46b00-446f-11eb-9586-e405a4f9a935.png"/>
   <br>
   <p align="center">
@@ -8,7 +8,7 @@
   <a href="#project-setup">Project Setup</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#license">License</a>
 </p>
-</h1>
+</h6>
 
 # Music Player 
 
